@@ -1,0 +1,22 @@
+{
+  "name": "flc-exoplayer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "unity-prepare": "node scripts/unity-prepare"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KosmoGalaxy/flc-exoplayer.git"
+  },
+  "author": "Tomasz Rozwadowski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KosmoGalaxy/flc-exoplayer/issues"
+  },
+  "homepage": "https://github.com/KosmoGalaxy/flc-exoplayer#readme",
+  "dependencies": {
+    "node-cmd": "^3.0.0"
+  }
+}

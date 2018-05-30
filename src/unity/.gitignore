@@ -1,0 +1,11 @@
+/.vs
+/build
+/Library
+/obj
+/Packages
+/Temp
+/Assembly-CSharp.csproj
+/Assembly-CSharp-Editor.csproj
+/flc-exoplayer-test-unity.sln
+/unity.csproj
+/unity.sln
