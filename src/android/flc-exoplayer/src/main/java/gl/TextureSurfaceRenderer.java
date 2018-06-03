@@ -52,10 +52,9 @@ public abstract class TextureSurfaceRenderer implements Runnable
         {
             long loopStart = System.currentTimeMillis();
 
-            if (draw())
-            {
-                egl.eglSwapBuffers(eglDisplay, eglSurface);
-            }
+            draw();
+            egl.eglSwapBuffers(eglDisplay, eglSurface);
+
 
             long waitDelta = 16 - (System.currentTimeMillis() - loopStart);    // Targeting 60 fps, no need for faster
             if (waitDelta > 0)
@@ -79,7 +78,9 @@ public abstract class TextureSurfaceRenderer implements Runnable
      * Main draw function, subclass this and add custom drawing code here. The rendering thread will attempt to limit
      * FPS to 60 to keep CPU usage low.
      */
-    protected abstract boolean draw();
+    public void draw() {
+        egl.eglSwapBuffers(eglDisplay, eglSurface);
+    }
 
     /**
      * OpenGL component initialization funcion. This is called after OpenGL context has been initialized on the rendering thread.

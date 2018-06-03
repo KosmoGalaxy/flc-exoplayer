@@ -17,7 +17,6 @@ class PrepareManager {
   private Surface _surface;
   public Surface surface() { return _surface; }
 
-
   private final Context _context;
   private Context context() { return _context; }
 
@@ -30,8 +29,7 @@ class PrepareManager {
   }
 
   public void prepare(String uri) {
-    Log.info(String.format(Locale.ENGLISH, "prepare. (uri)=%s", uri));
-    _reset();
+    Log.info(String.format(Locale.ENGLISH, "PrepareManager prepare. (uri)=%s", uri));
     DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
       context(),
       Util.getUserAgent(context())
@@ -39,16 +37,6 @@ class PrepareManager {
     MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory)
       .createMediaSource(Uri.parse(uri));
     player().prepare(mediaSource);
-  }
-
-  public void setSurface(Surface surface) {
-    Log.info("prepare manager surface set");
-    _surface = surface;
-    player().setVideoSurface(surface());
-  }
-
-  private void _reset() {
-    _surface = null;
   }
 
 }

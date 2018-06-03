@@ -144,7 +144,7 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
     }
 
     @Override
-    protected boolean draw()
+    public void draw()
     {
         synchronized (this)
         {
@@ -156,7 +156,7 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
             }
             else
             {
-                return false;
+                return;
             }
 
         }
@@ -190,7 +190,7 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
         GLES20.glDisableVertexAttribArray(positionHandle);
         GLES20.glDisableVertexAttribArray(textureCoordinateHandle);
 
-        return true;
+        super.draw();
     }
 
     private void adjustViewport()

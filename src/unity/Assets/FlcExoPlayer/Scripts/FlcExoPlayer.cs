@@ -27,7 +27,6 @@ namespace FullLegitCode.ExoPlayer
             try
             {
                 _jo = new AndroidJavaObject("pl.fulllegitcode.exoplayer_unity.PlayerUnity");
-                _CreateTexture();
                 _Log("new Player created");
             }
             catch (Exception e)
@@ -36,14 +35,42 @@ namespace FullLegitCode.ExoPlayer
             }
         }
 
+        void OnRenderObject()
+        {
+            if (_jo != null)
+            {
+                //_jo.Call("update");
+            }
+        }
+
+        public int Test()
+        {
+            return _jo.Call<int>("test");
+        }
+
+        public void Test2(int textureId)
+        {
+            _jo.Call("test2", new object[] { textureId });
+        }
+
+        public int Test3()
+        {
+            return _jo.Call<int>("test3");
+        }
+
+        public void Test3_Update()
+        {
+            _jo.Call("test3_update");
+        }
+
         public void Prepare(String uri)
         {
             try
             {
                 _Log(string.Format("prepare. (uri)={0}", uri));
-                object[] args = new object[1] { uri };
+                _CreateTexture();
+                object[] args = { uri, Texture.GetNativeTexturePtr().ToInt32() };
                 _jo.Call("prepare", args);
-                //return Texture2D.CreateExternalTexture(3840, 1920, TextureFormat.ARGB32, false, true, new IntPtr(textureId));
             }
             catch (Exception e)
             {
@@ -57,11 +84,11 @@ namespace FullLegitCode.ExoPlayer
             Color32[] pixels = texture.GetPixels32();
             for (int i = 0; i < pixels.Length; i++)
             {
-                pixels[i] = new Color32(0xff, 0, 0, 0xff);
+                //pixels[i] = new Color32(0xff, 0, 0, 0xff);
             }
             texture.SetPixels32(pixels);
             texture.Apply();
-            _jo.Call("setTexture", new object[3] { texture.GetNativeTexturePtr().ToInt32(), texture.width, texture.height });
+            Texture = texture;
         }
     }
 }

@@ -2,6 +2,9 @@ package pl.fulllegitcode.exoplayer;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
+import android.opengl.GLUtils;
 import android.os.Handler;
 import android.view.Surface;
 
@@ -48,20 +51,66 @@ public class Player {
   public Player(Context context) {
     _context = context;
     _player = _createPlayer();
-    _surfaceManager = new SurfaceManager(context());
+    _surfaceManager = new SurfaceManager(context(), player());
     _prepareManager = new PrepareManager(context(), player());
     _setupPlayer();
     _bindPlayer();
-    _loop();
+  }
+
+  public int test() {
+    int[] textureIdHolder = new int[1];
+    GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+    GLES20.glGenTextures(1, textureIdHolder, 0);
+    _checkGlError("gen");
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureIdHolder[0]);
+    _checkGlError("bind");
+    GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, 1024, 1024, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+    _checkGlError("tex");
+    return textureIdHolder[0];
+  }
+
+  public void test2(int textureId) {
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
+    _checkGlError("bind");
+    GLES20.glClearColor((float) Math.random(), 1f, 1f, 1f);
+    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+    _checkGlError("clear");
+  }
+
+  private int[] _test3_textureIdHolder = new int[1];
+  private SurfaceTexture _test3_texture;
+  private Surface _test3_surface;
+  public int test3() {
+    GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+    GLES20.glGenTextures(1, _test3_textureIdHolder, 0);
+    _checkGlError("Texture generate");
+    GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, _test3_textureIdHolder[0]);
+    _checkGlError("Texture bind");
+    _test3_texture = new SurfaceTexture(_test3_textureIdHolder[0]);
+    _test3_surface = new Surface(_test3_texture);
+    player().setVideoSurface(_test3_surface);
+    prepareManager().prepare("http://rdstest.pl/redbull_1.mp4");
+    return _test3_textureIdHolder[0];
+  }
+  public void test3_update() {
+    if (_test3_texture != null) {
+      _test3_texture.updateTexImage();
+    }
+  }
+
+  private void _checkGlError(String op)
+  {
+    int error;
+    while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+      android.util.Log.e("SurfaceTest", op + ": glError " + GLUtils.getEGLErrorString(error));
+    }
   }
 
   //region control
 
-  private SurfaceTexture _asd;
-  public void prepare(String uri, SurfaceTexture texture) {
-    _asd = texture;
-    _reset();
-    _state = State.Preparing;
+  public void prepare(String uri, int textureId) {
+    Log.info(String.format(Locale.ENGLISH, "Player prepare. (uri)=%s (texture id)=%d", uri, textureId));
+    surfaceManager().setup(textureId);
     prepareManager().prepare(uri);
   }
 
@@ -69,16 +118,11 @@ public class Player {
 
   //region lifecycle
 
-  public void dispose() {
-    _isDisposed = true;
+  public void update() {
+    surfaceManager().update();
   }
 
-  private void _reset() {
-    _state = State.Idle;
-    surfaceManager().reset();
-  }
-
-  private void _loop() {
+  /*private void _loop() {
     final Handler handler = new Handler();
     handler.postDelayed(
       new Runnable() {
@@ -97,20 +141,7 @@ public class Player {
       },
       100
     );
-  }
-
-  private void _updatePreparing() {
-    Format format = player().getVideoFormat();
-    if (format == null) {
-      return;
-    }
-    if (surfaceManager().surface() == null && !surfaceManager().isDuringSetup()) {
-      surfaceManager().setup(format.width, format.height, _asd);
-    }
-    if (prepareManager().surface() == null && surfaceManager().surface() != null) {
-      prepareManager().setSurface(surfaceManager().surface());
-    }
-  }
+  }*/
 
   //endregion
 
