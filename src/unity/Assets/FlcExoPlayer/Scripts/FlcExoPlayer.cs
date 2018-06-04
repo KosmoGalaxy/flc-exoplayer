@@ -43,24 +43,14 @@ namespace FullLegitCode.ExoPlayer
             }
         }
 
-        public int Test()
+        public int Test_Init(int sourceTextureId)
         {
-            return _jo.Call<int>("test");
+            return _jo.Call<int>("test_init", new object[] { sourceTextureId });
         }
 
-        public void Test2(int textureId)
+        public void Test_Render()
         {
-            _jo.Call("test2", new object[] { textureId });
-        }
-
-        public int Test3()
-        {
-            return _jo.Call<int>("test3");
-        }
-
-        public void Test3_Update()
-        {
-            _jo.Call("test3_update");
+            _jo.Call("test_render");
         }
 
         public void Prepare(String uri)

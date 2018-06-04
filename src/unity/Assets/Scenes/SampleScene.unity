@@ -362,3 +362,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83f1cfba8af4bf34da5d32d87100b20a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sourceTexture: {fileID: 2800000, guid: f0418bf876ed0ec4e80a8cc9e01a432c, type: 3}

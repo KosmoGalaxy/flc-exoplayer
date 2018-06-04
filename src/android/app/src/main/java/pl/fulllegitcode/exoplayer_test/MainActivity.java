@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   protected void onDestroy() {
     super.onDestroy();
     if (_player != null) {
-      _player.dispose();
+//      _player.dispose();
     }
   }
 
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
   @Override
   public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
     _log("================== onSurfaceTextureAvailable");
-    _player.prepare("http://rdstest.pl/redbull_1.mp4", surface);
+//    _player.prepare("http://rdstest.pl/redbull_1.mp4", surface);
   }
 
   @Override

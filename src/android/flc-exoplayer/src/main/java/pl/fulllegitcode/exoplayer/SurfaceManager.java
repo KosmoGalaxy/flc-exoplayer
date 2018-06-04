@@ -47,13 +47,13 @@ class SurfaceManager {
   public void setup(int textureId) {
     Log.info(String.format(Locale.ENGLISH, "SurfaceManager setup. (texture id)=%d", textureId));
     _createRenderer(textureId);
-    _surface = new Surface(renderer().videoTexture());
+//    _surface = new Surface(renderer().videoTexture());
     player().setVideoSurface(surface());
   }
 
   public void update() {
     if (renderer() != null) {
-      renderer().update();
+//      renderer().update();
     }
   }
 
