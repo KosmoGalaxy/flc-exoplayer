@@ -1,86 +1,84 @@
 package pl.fulllegitcode.exoplayer_test;
 
-import android.graphics.SurfaceTexture;
+import android.content.Context;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Surface;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.TextureView;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import java.util.Locale;
+import gl.VideoTextureRenderer;
+import pl.fulllegitcode.exoplayer.ExoManager;
 
-import pl.fulllegitcode.exoplayer.Player;
-import pl.fulllegitcode.exoplayer.Test;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
+  static final String TAG = "FlcExoPlayerTest";
 
-  final String TAG = "FlcExoPlayerTest";
+  public static MainActivity instance;
 
-  private Player _player;
-  private TextureView _view;
-  private Test _test;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    _test();
+    instance = this;
+//    _test1();
+    _test2();
   }
 
-  @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    if (_player != null) {
-//      _player.dispose();
-    }
-  }
+  /*private SurfaceView _view;
+  private ExoManager _exoManager;
 
-  private void _test() {
-    _player = new Player(this);
-    _view = new TextureView(this);
-    _view.setSurfaceTextureListener(this);
+  private void _test1() {
+    final Context context = this;
+    _view = new SurfaceView(this);
+    _view.getHolder().addCallback(new SurfaceHolder.Callback() {
+      @Override
+      public void surfaceCreated(SurfaceHolder holder) {
+        _exoManager = new ExoManager(context, holder.getSurface());
+      }
+
+      @Override
+      public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+      }
+
+      @Override
+      public void surfaceDestroyed(SurfaceHolder holder) {
+
+      }
+    });
     addContentView(
       _view,
       new LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
       )
     );
-    /*addContentView(
-      _player.view(),
-      new LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
-      )
-    );*/
-  }
+  }*/
 
-  @Override
-  public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-    _log("================== onSurfaceTextureAvailable");
-//    _player.prepare("http://rdstest.pl/redbull_1.mp4", surface);
-  }
+  private VideoTextureRenderer _renderer;
+  private ExoManager _exoManager;
 
-  @Override
-  public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-  }
-
-  @Override
-  public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-    return false;
-  }
-
-  @Override
-  public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
+  private void _test2() {
+    final Context context = this;
+    _renderer = new VideoTextureRenderer(this, null, 1024, 1024, null);
+    _renderer.videoTextureReadyCallback = new VideoTextureRenderer.VideoTextureReadyCallback() {
+      @Override
+      public void onReady() {
+        _log("video texture ready: " + _renderer.getVideoTextureId());
+        _exoManager = new ExoManager(context, new Surface(_renderer.getVideoTexture()));
+      }
+    };
   }
 
   private void _log(String message) {
-    Log.d(TAG, message);
+    Log.d(TAG, "---------------------- " + message);
   }
 
   private void _logError(Exception e) {

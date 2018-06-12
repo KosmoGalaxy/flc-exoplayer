@@ -13,8 +13,15 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import javax.microedition.khronos.egl.EGLContext;
+
 public class VideoTextureRenderer extends TextureSurfaceRenderer implements SurfaceTexture.OnFrameAvailableListener
 {
+    public interface VideoTextureReadyCallback {
+        void onReady();
+    }
+
+
     private static final String vertexShaderCode =
                     "attribute vec4 vPosition;" +
                     "attribute vec4 vTexCoordinate;" +
@@ -68,9 +75,11 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
     private int videoHeight;
     private boolean adjustViewport = false;
 
-    public VideoTextureRenderer(Context context, SurfaceTexture texture, int width, int height)
+    public VideoTextureReadyCallback videoTextureReadyCallback;
+
+    public VideoTextureRenderer(Context context, SurfaceTexture texture, int width, int height, EGLContext parentEglContext)
     {
-        super(texture, width, height);
+        super(texture, width, height, parentEglContext);
         this.ctx = context;
         videoTextureTransform = new float[16];
     }
@@ -141,10 +150,14 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
 
         videoTexture = new SurfaceTexture(textures[0]);
         videoTexture.setOnFrameAvailableListener(this);
+
+        if (videoTextureReadyCallback != null) {
+            videoTextureReadyCallback.onReady();
+        }
     }
 
     @Override
-    public void draw()
+    protected boolean draw()
     {
         synchronized (this)
         {
@@ -156,7 +169,7 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
             }
             else
             {
-                return;
+                return false;
             }
 
         }
@@ -190,7 +203,7 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
         GLES20.glDisableVertexAttribArray(positionHandle);
         GLES20.glDisableVertexAttribArray(textureCoordinateHandle);
 
-        super.draw();
+        return true;
     }
 
     private void adjustViewport()
@@ -219,6 +232,10 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
     @Override
     protected void initGLComponents()
     {
+        int[] h = new int[1];
+        GLES20.glGenTextures(1, h, 0);
+        Log.d("FlcExoPlayer", "------------ gen tex: " + h[0]);
+
         setupVertexBuffer();
         setupTexture(ctx);
         loadShaders();
@@ -251,6 +268,10 @@ public class VideoTextureRenderer extends TextureSurfaceRenderer implements Surf
     public SurfaceTexture getVideoTexture()
     {
         return videoTexture;
+    }
+
+    public int getVideoTextureId() {
+        return textures[0];
     }
 
     @Override

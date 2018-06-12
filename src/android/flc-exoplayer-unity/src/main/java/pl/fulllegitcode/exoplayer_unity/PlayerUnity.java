@@ -1,23 +1,25 @@
 package pl.fulllegitcode.exoplayer_unity;
 
+import android.content.Context;
+
 import com.unity3d.player.UnityPlayer;
 
 import pl.fulllegitcode.exoplayer.Player;
 
 public class PlayerUnity extends Player {
 
-  public PlayerUnity() {
-    super(UnityPlayer.currentActivity);
+  private static PlayerUnity _player;
+
+  public static void create() {
+    _player = new PlayerUnity();
   }
 
-  public void prepareOnUiThread(final String uri, final int textureId) {
-    final PlayerUnity thiz = this;
-    UnityPlayer.currentActivity.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-//        thiz.prepare(uri, textureId);
-      }
-    });
+  public static int getPlayerTextureId() {
+    return _player != null ? _player.getTextureId() : 0;
   }
+
+
+  @Override
+  protected Context _getContext() { return UnityPlayer.currentActivity; }
 
 }

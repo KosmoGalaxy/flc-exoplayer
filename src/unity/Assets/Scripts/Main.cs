@@ -4,34 +4,41 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-    public Texture2D sourceTexture;
-
-    bool _isStarted;
-    bool _isPrepared;
-    int _textureId;
-
-    void Start()
+    /*private void Update()
     {
-        _isStarted = true;
-    }
+        GetComponent<FlcExoPlayer>().Test(_texture);
+    }*/
 
-    void OnRenderObject()
+    /*private void Update()
+    {
+        if (!_texture)
+        {
+            int textureId = GetComponent<FlcExoPlayer>().Test();
+            if (textureId != 0)
+            {
+                _texture = Texture2D.CreateExternalTexture(1024, 1024, TextureFormat.ARGB32, false, true, new IntPtr(textureId));
+                GetComponent<MeshRenderer>().material.mainTexture = _texture;
+            }
+        }
+    }*/
+
+    /*void OnRenderObject()
     {
         if (!_isStarted)
         {
             return;
         }
         FlcExoPlayer player = GetComponent<FlcExoPlayer>();
-        if (!_isPrepared)
+        if (!_isPrepared && Time.time > 1f)
         {
             _textureId = player.Test_Init(sourceTexture.GetNativeTexturePtr().ToInt32());
             Texture2D texture = Texture2D.CreateExternalTexture(1024, 1024, TextureFormat.ARGB32, false, true, new IntPtr(_textureId));
             GetComponent<MeshRenderer>().material.mainTexture = texture;
             _isPrepared = true;
         }
-        else
+        if (_isPrepared)
         {
             player.Test_Render();
         }
-    }
+    }*/
 }

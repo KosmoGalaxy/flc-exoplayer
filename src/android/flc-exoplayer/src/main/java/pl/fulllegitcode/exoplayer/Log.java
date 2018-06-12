@@ -9,7 +9,7 @@ public class Log {
   }
 
   public static void info(String message) {
-    android.util.Log.i(TAG, message);
+    android.util.Log.i(TAG, "------------------ " + message);
   }
 
 }

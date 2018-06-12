@@ -26,17 +26,20 @@ public abstract class TextureSurfaceRenderer implements Runnable
     protected int height;
     private boolean running;
 
+    private EGLContext parentEglContext;
+
     /**
      * @param texture Surface texture on which to render. This has to be called AFTER the texture became available
      * @param width Width of the passed surface
      * @param height Height of the passed surface
      */
-    public TextureSurfaceRenderer(SurfaceTexture texture, int width, int height)
+    public TextureSurfaceRenderer(SurfaceTexture texture, int width, int height, EGLContext parentEglContext)
     {
         this.texture = texture;
         this.width = width;
         this.height = height;
         this.running = true;
+        this.parentEglContext = parentEglContext;
         Thread thrd = new Thread(this);
         thrd.start();
     }
@@ -51,10 +54,12 @@ public abstract class TextureSurfaceRenderer implements Runnable
         while (running)
         {
             long loopStart = System.currentTimeMillis();
+            pingFps();
 
-            draw();
-            egl.eglSwapBuffers(eglDisplay, eglSurface);
-
+            /*if (draw())
+            {
+                egl.eglSwapBuffers(eglDisplay, eglSurface);
+            }*/
 
             long waitDelta = 16 - (System.currentTimeMillis() - loopStart);    // Targeting 60 fps, no need for faster
             if (waitDelta > 0)
@@ -78,9 +83,7 @@ public abstract class TextureSurfaceRenderer implements Runnable
      * Main draw function, subclass this and add custom drawing code here. The rendering thread will attempt to limit
      * FPS to 60 to keep CPU usage low.
      */
-    public void draw() {
-        egl.eglSwapBuffers(eglDisplay, eglSurface);
-    }
+    protected abstract boolean draw();
 
     /**
      * OpenGL component initialization funcion. This is called after OpenGL context has been initialized on the rendering thread.
@@ -88,6 +91,23 @@ public abstract class TextureSurfaceRenderer implements Runnable
      */
     protected abstract void initGLComponents();
     protected abstract void deinitGLComponents();
+
+    private long lastFpsOutput = 0;
+    private int frames;
+    private void pingFps()
+    {
+        if (lastFpsOutput == 0)
+            lastFpsOutput = System.currentTimeMillis();
+
+        frames ++;
+
+        if (System.currentTimeMillis() - lastFpsOutput > 1000)
+        {
+//            Log.d(LOG_TAG, "FPS: " + frames);
+            lastFpsOutput = System.currentTimeMillis();
+            frames = 0;
+        }
+    }
 
 
     /**
@@ -110,7 +130,7 @@ public abstract class TextureSurfaceRenderer implements Runnable
         EGLConfig eglConfig = chooseEglConfig();
         eglContext = createContext(egl, eglDisplay, eglConfig);
 
-        eglSurface = egl.eglCreateWindowSurface(eglDisplay, eglConfig, texture, null);
+        /*eglSurface = egl.eglCreateWindowSurface(eglDisplay, eglConfig, texture, null);
 
         if (eglSurface == null || eglSurface == EGL10.EGL_NO_SURFACE)
         {
@@ -120,7 +140,8 @@ public abstract class TextureSurfaceRenderer implements Runnable
         if (!egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext))
         {
             throw new RuntimeException("GL Make current error: " + GLUtils.getEGLErrorString(egl.eglGetError()));
-        }
+        }*/
+        egl.eglMakeCurrent(eglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, eglContext);
     }
 
     private void deinitGL()
@@ -135,7 +156,7 @@ public abstract class TextureSurfaceRenderer implements Runnable
     private EGLContext createContext(EGL10 egl, EGLDisplay eglDisplay, EGLConfig eglConfig)
     {
         int[] attribList = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE };
-        return egl.eglCreateContext(eglDisplay, eglConfig, EGL10.EGL_NO_CONTEXT, attribList);
+        return egl.eglCreateContext(eglDisplay, eglConfig, parentEglContext != null ? parentEglContext : EGL10.EGL_NO_CONTEXT, attribList);
     }
 
     private EGLConfig chooseEglConfig()
